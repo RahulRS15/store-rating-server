@@ -1,13 +1,17 @@
 const mongoose = require('mongoose');
+require('dotenv').config();
 
 const connectDB = async () => {
   try {
-    await mongoose.connect('mongodb://localhost:27017/store-rating-app');
-    console.log('MongoDB Connected');
+    await mongoose.connect(process.env.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log('✅ MongoDB Connected');
   } catch (error) {
-    console.error('Error connecting to MongoDB:', error.message);
+    console.error('❌ MongoDB Connection Error:', error.message);
     process.exit(1);
   }
 };
 
-module.exports = connectDB;
+module.exports = connectDB; // ✅ Export the function

@@ -3,24 +3,23 @@ const User = require('../model/User');
 const JWT_SECRET = "thetaskisbeinginprocess";
 
 const protect = async (req, res, next) => {
-   const token = req.header('auth-token');
-
-    if (!token) {
-        res.status(401).send({ error: "Please authenticate using a valid token" });
-    }
-
-    try {
-      const decodedUser = jwt.verify(token, JWT_SECRET);
-      req.user = await User.findById(decodedUser.id).select('-password');
-      next();
-    } catch (error) {
-      res.status(401).json({ error,message: 'Not authorized, token failed' });
-    }
-
-//   console.log("iutput ",req.header);
+  const token = req.header('auth-token');
 
   if (!token) {
-    res.status(401).json({ message: 'Not authorized, no token' });
+    return res.status(401).json({ error: "Please authenticate using a valid token" });
+  }
+
+  try {
+    const decodedUser = jwt.verify(token, JWT_SECRET);
+    req.user = await User.findById(decodedUser.id).select('-password');
+
+    if (!req.user) {
+      return res.status(401).json({ error: "User not found" });
+    }
+
+    next(); // ✅ Only called when authentication succeeds
+  } catch (error) {
+    return res.status(401).json({ error: 'Not authorized, token failed' });
   }
 };
 
